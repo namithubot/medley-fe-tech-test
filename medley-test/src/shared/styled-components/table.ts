@@ -9,6 +9,10 @@ export const TableTitle = styled.h3 `
 export const StyledTable = styled.table `
   width: 100%;
 
+  td {
+	text-align: center;
+  }
+
   tbody tr {
     height: 2rem;
     &:nth-child(odd) {

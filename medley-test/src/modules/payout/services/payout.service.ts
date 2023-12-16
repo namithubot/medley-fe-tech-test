@@ -1,18 +1,4 @@
 ﻿import {Payout} from "../models/payout";
-import { PayoutStatus } from "../models/status.enum";
-
-/**
- * Gets payout history.
- * @returns {Payout[]} List of the payouts.
- */
-export async function getPayouts(): Promise<Payout[]> {
-    const response = await fetch('https://theseus-staging.lithium.ventures/api/v1/analytics/tech-test/payouts', {
-        method: "GET",
-    });
-    const res = await response.json();
-
-    return res.data.map(trasformResponseToPayout);
-}
 
 /**
  * Searches of a payout by a search term.
@@ -27,7 +13,21 @@ export async function searchPayout(searchString: string): Promise<Payout[]> {
     const response = await fetch(`https://theseus-staging.lithium.ventures/api/v1/analytics/tech-test/search?query=${searchString}`, {
         method: "GET",
     });
-    return await response.json();
+    const res = await response.json();
+    return (res as any[]).map(trasformResponseToPayout);
+}
+
+/**
+ * Gets payout history.
+ * @returns {Payout[]} List of the payouts.
+ */
+async function getPayouts(): Promise<Payout[]> {
+    const response = await fetch('https://theseus-staging.lithium.ventures/api/v1/analytics/tech-test/payouts', {
+        method: "GET",
+    });
+    const res = await response.json();
+
+    return res.data.map(trasformResponseToPayout);
 }
 
 function trasformResponseToPayout(response: any): Payout {

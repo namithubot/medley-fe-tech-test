@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import PayoutTable from './modules/payout/view/PayoutTable';
 import styled from 'styled-components';
