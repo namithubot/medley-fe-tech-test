@@ -13,8 +13,10 @@ export async function searchPayout(searchString: string): Promise<Payout[]> {
 
     const response = await fetch(`https://theseus-staging.lithium.ventures/api/v1/analytics/tech-test/search?query=${searchString}`, {
         method: "GET",
+    }).catch(error => {
+        console.error(error);
     });
-    const res = await response.json();
+    const res = await response?.json();
     return (res as any[]).map(trasformResponseToPayout);
 }
 
@@ -29,12 +31,19 @@ export async function getPayouts(page: number, limit: number): Promise<PayoutRes
         `https://theseus-staging.lithium.ventures/api/v1/analytics/tech-test/payouts?page=${page}&limit=${limit}`,
         {
             method: "GET",
-        });
-    const res = await response.json();
+        }).catch(error => {
+            console.error(error);
+        });;
+    const res = await response?.json();
 
     return transformPagedResponse(res);
 }
 
+/**
+ * Transforms the API response to UI data structure for paginated payout response.
+ * @param response Payout response containing payouts and pagination data
+ * @returns Payout Response in typed format.
+ */
 function transformPagedResponse(response: any): PayoutResponse {
     return {
         payouts: response.data.map(trasformResponseToPayout),
@@ -42,6 +51,11 @@ function transformPagedResponse(response: any): PayoutResponse {
     };
 }
 
+/**
+ * Transforms Payout from API contract to UI data structure.
+ * @param response Response containing payout data
+ * @returns Payout data structure in Typed format.
+ */
 function trasformResponseToPayout(response: any): Payout {
     return {
         dateAndTime: new Date(response.dateAndTime),
