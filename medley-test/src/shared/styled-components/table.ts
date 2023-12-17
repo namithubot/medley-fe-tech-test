@@ -22,8 +22,13 @@ export const StyledTable = styled.table< { $columnWidth?: number } > `
 	width: ${props => props?.$columnWidth ?? 'fit-content' }
   }
 
+  thead tr {
+	color: darkgray;
+  }
+
   tbody tr {
     height: 2rem;
+	font-weight: 500;
     &:nth-child(odd) {
       background-color: #f8f8f8;
     }

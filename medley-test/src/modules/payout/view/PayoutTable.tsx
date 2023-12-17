@@ -2,27 +2,11 @@ import React, { useEffect, useState } from "react";
 import "./PayoutTable.css";
 import { Payout } from "../models/payout";
 import { getPayouts, searchPayout } from "../services/payout.service";
-import {
-  TableTitle,
-} from "../../../shared/styled-components/table";
+import { TableTitle } from "../../../shared/styled-components/table";
 import { PageTitle, PageContent } from "../../../shared/styled-components/page";
-import { InputFlat } from "../../../shared/styled-components/form";
+import { Button, InputFlat, Selector } from "../../../shared/styled-components/form";
 import styled from "styled-components";
 import DataTable from "./DataTable/DataTable";
-
-/**
- * Buttons to navigate the pagination.
- */
-const PageButton = styled.button `
-  margin: 1rem;
-`;
-
-/**
- * Selector to selct the maximum number of entries in a single page.
- */
-const PageLimitSelector = styled.select `
-  margin: 1rem;
-`;
 
 /**
  * Payout table component.
@@ -45,8 +29,14 @@ function PayoutTable() {
     // Wait for 1000 second and do a search API call.
     const timeoutId = setTimeout(async () => {
       try {
-        const filterdPayouts = await searchPayout(query);
-        setPayouts(filterdPayouts);
+        if (query) {
+          const filterdPayouts = await searchPayout(query);
+          setPayouts(filterdPayouts);
+        } else {
+          const pagedPayouts = await getPayouts(page, limit);
+          setPayouts(pagedPayouts.payouts);
+          setTotalCount(pagedPayouts.pageData.totalCount);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -61,7 +51,7 @@ function PayoutTable() {
    * @returns A number representing the maximum page count.
    */
   function getMaxPageNumber() {
-    return Math.floor(totalCount/limit) + (totalCount%limit ? 1 : 0);
+    return Math.floor(totalCount / limit) + (totalCount % limit ? 1 : 0);
   }
 
   useEffect(() => {
@@ -70,7 +60,7 @@ function PayoutTable() {
       setPayouts(pagedPayouts.payouts);
       setTotalCount(pagedPayouts.pageData.totalCount);
     }
-  
+
     getAllPayouts();
   }, [page, limit]);
 
@@ -86,17 +76,27 @@ function PayoutTable() {
         />
         {/** Pagination */}
         <span>
-          <PageButton onClick={_ => setPage(page - 1)} disabled={page === 1}>Prev</PageButton>
-            {page} of { getMaxPageNumber() } With size
-            <PageLimitSelector value={limit} onChange={e => setLimit(parseInt(e.target.value))}>
-              <option value={10}>10</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </PageLimitSelector>
-          <PageButton onClick={_ => setPage(page + 1)} disabled={ page === getMaxPageNumber() }>Next</PageButton>
+          <Button onClick={(_) => setPage(page - 1)} disabled={page === 1}>
+            Prev
+          </Button>
+          {page} of {getMaxPageNumber()} With size
+          <Selector
+            value={limit}
+            onChange={(e) => setLimit(parseInt(e.target.value))}
+          >
+            <option value={10}>10</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </Selector>
+          <Button
+            onClick={(_) => setPage(page + 1)}
+            disabled={page === getMaxPageNumber()}
+          >
+            Next
+          </Button>
         </span>
         {/** The table containing the data. */}
-        <DataTable payouts={payouts}></DataTable> 
+        <DataTable payouts={payouts}></DataTable>
       </PageContent>
     </div>
   );
