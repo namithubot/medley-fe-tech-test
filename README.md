@@ -2,7 +2,7 @@
 
 ## Overview
 
-We are seeking a capable developer to build a front-end application using either React or Next.js, combined with TypeScript. Your choice of framework should be based on your preference and expertise. The application should closely align with the designs found in this [Figma file](https://www.figma.com/file/hGBI3zpyHia5yrWsgeMP3K/Untitled?node-id=0%3A1&mode=dev). It is essential that the application utilises Styled Components for styling.
+This application displays and searches through the payouts to users. The table is available at the root URL of the application.
 
 ## Technical Requirements
 
@@ -16,7 +16,7 @@ We are seeking a capable developer to build a front-end application using either
 
 ### API Integration
 
-You will be integrating with an existing API. Here are the details of the endpoints you will need to interact with:
+The project is using the following APIs. These are the dependencies for this project to work.
 
 1. **Payouts Endpoint**
 
@@ -40,7 +40,7 @@ You will be integrating with an existing API. Here are the details of the endpoi
    page: The page number to retrieve.
    limit: The number of payouts to retrieve per page.
 
-3. **Search Endpoint**
+2. **Search Endpoint**
 
    **Endpoint:** `https://theseus-staging.lithium.ventures/api/v1/analytics/tech-test/search?query=SEARCH_TERM`
 
@@ -48,18 +48,49 @@ You will be integrating with an existing API. Here are the details of the endpoi
 
    **Description:** This endpoint allows for searching payouts by username. Implement a functionality that facilitates user search with a keen focus on optimizing the user experience whilst considering performance.
 
+#### Note: These APIs don't have any authentication in place. The app doesn't send any auth data.
 
-## Evaluation Criteria
+## Project structure
+            - Root
+                - medley-test (React App)
+                    - public (assets)
+                    - src (source code)
+                        - Index.tsx (react entry point)
+                        - App.tsx (applicaton entry point)
+                        - shared (code shared between modules. These are generalizable enought)
+                            - styled-components (General styled components)
+                             --------- Component Files -----------
+                        - modules (Application modules. Directory is grouped by feature)
+                            - {module-name}
+                                - models (Data structures, interfaces etc.)
+                                - services (Services to interact with API and do background tasks)
+                                - view (React components)
+                                    - {Component to integrate everything for the page}.tsx
+                                    - subdirectories for smaller and finer components
 
-- Adherence to the design as specified in the Figma file.
-- Proper usage of TypeScript and Styled Components.
-- Attention to detail in implementing various functionalities.
-- Optimizations implemented to enhance the user experience.
+This structure doesn't include tests, but they can be included inside the modules. Any integration test would have a separate folder at the root of the react app.
+Shared folder ensures that we are making reusable components and are avoiding any unnecessary duplication of code.
 
-## Submission
+## Approach
+- The Application loads the page and for the first time. It loads the data with 10 as page size and 1 as page number. The limit is taken as 10 to ensure that the API call is lighter and the page loading is faster.
+- On the paginated API call we are also setting the total count of the data which helps us ensure we don't make a call to a page that doesn't exist.
+- There are two buttons for navigating through pages and one dropdown to select the page size. These are minimally styled at the moment.
+- There is a search bar which sets the query to be searched on. The code waits for a second before making a call so that we avoid unnecessary calls while the user is still typing.
+- Whenever these calls are made the payout data is set again with the set state function. This would be reflected on the table to which the data is fed.
 
-Replace the contents of this README.md with a brief summary of your approach, the tech choices, and any instructions required to run your application.
+## Tech stack
+The tech stack is minimal, you only require
+1. Reactjs
+2. Styled components
 
-Email as an attachment or a link the git bundled repository showing your commit history with all your commits on the main branch:
+I have kept it minimal and not used any design system either.
 
-        git bundle create <anything>.bundle --all
+## Running the project
+From this directory
+```
+    $ cd medley-test
+    $ npm i
+    $ npm run start
+```
+
+This will start the server at [localhost:3000](http://localhost:3000/)
