@@ -1,4 +1,5 @@
-﻿import {Payout} from "../models/payout";
+﻿import { Payout } from "../models/payout";
+import { PayoutResponse } from "../models/payout.response";
 
 /**
  * Searches of a payout by a search term.
@@ -7,7 +8,7 @@
  */
 export async function searchPayout(searchString: string): Promise<Payout[]> {
     if (!searchString) {
-        return getPayouts();
+        console.error('No Search input provided');
     }
 
     const response = await fetch(`https://theseus-staging.lithium.ventures/api/v1/analytics/tech-test/search?query=${searchString}`, {
@@ -19,15 +20,26 @@ export async function searchPayout(searchString: string): Promise<Payout[]> {
 
 /**
  * Gets payout history.
+ * @param page The page number it should fetch.
+ * @param limit Maximum number of entries in one page allowed.
  * @returns {Payout[]} List of the payouts.
  */
-async function getPayouts(): Promise<Payout[]> {
-    const response = await fetch('https://theseus-staging.lithium.ventures/api/v1/analytics/tech-test/payouts', {
-        method: "GET",
-    });
+export async function getPayouts(page: number, limit: number): Promise<PayoutResponse> {
+    const response = await fetch(
+        `https://theseus-staging.lithium.ventures/api/v1/analytics/tech-test/payouts?page=${page}&limit=${limit}`,
+        {
+            method: "GET",
+        });
     const res = await response.json();
 
-    return res.data.map(trasformResponseToPayout);
+    return transformPagedResponse(res);
+}
+
+function transformPagedResponse(response: any): PayoutResponse {
+    return {
+        payouts: response.data.map(trasformResponseToPayout),
+        pageData: response.metadata
+    };
 }
 
 function trasformResponseToPayout(response: any): Payout {
